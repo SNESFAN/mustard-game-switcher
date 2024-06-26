@@ -29,8 +29,6 @@ int swHeight = 480;
 int hwWidth = 640;
 int hwHeight = 480;
 
-
-
 #ifdef DEBUG
 bool debugMode = true;
 string MUOS_HISTORY_DIR = "/mnt/muOSDump/mnt/mmc/MUOS/info/history";
@@ -79,6 +77,11 @@ double approachCamY;
 int dirXInput = 0;
 int dirYInput = 0;
 
+/**
+ * Extracts the save file directory and save state directory paths from a config file.
+ * 
+ * @return A pair of strings representing the save file directory and save state directory paths.
+ */
 std::pair<std::string, std::string> pathvar() {
     std::ifstream configFile(MUOS_configFile);
     std::ofstream logFile(MUOS_logFile);
@@ -92,15 +95,12 @@ std::pair<std::string, std::string> pathvar() {
 
         while (std::getline(configFile, line)) {
             if (line.find(targetWord1) == 0) {
-                // Extract path value from the line (assuming the path is surrounded by double quotes)
                 savefileDir = line.substr(line.find("\"") + 1, line.rfind("\"") - line.find("\"") - 1);
-            }
-            if (line.find(targetWord2) == 0) {
-                // Extract path value from the line (assuming the path is surrounded by double quotes)
+            } else if (line.find(targetWord2) == 0) {
                 savestateDir = line.substr(line.find("\"") + 1, line.rfind("\"") - line.find("\"") - 1);
             }
         }
-            // Log the extracted paths or if it failed
+
         if (!savefileDir.empty() || !savestateDir.empty()) {
             logFile << "Paths extracted and logged successfully." << std::endl;
             logFile << "Save File Path: " << savefileDir << std::endl;
@@ -119,26 +119,32 @@ std::pair<std::string, std::string> pathvar() {
     return std::make_pair(savefileDir, savestateDir);
 }
 
+/**
+ * @brief Initializes the SDL library and sets up the necessary components for the game switcher.
+ * 
+ * This function initializes SDL, connects the joystick, creates a window and renderer, and initializes fonts.
+ * 
+ * @note Make sure to call this function before using any other SDL-related functionality.
+ */
 void initSDL()
 {
-
     // Initialize SDL
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 
     // Connect joystick 0
     SDL_JoystickEventState(SDL_ENABLE);
     joystick = SDL_JoystickOpen(0);
-
+    
+    // Set the window size
     window = SDL_CreateWindow("SDL2 Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, hwWidth, hwHeight, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     if (renderer)
-    {
-        if (mrenderer != nullptr)
-        {
-            delete mrenderer;
-        }
+    { 
+        delete mrenderer;
         mrenderer = new Mustard::Renderer(renderer);
     }
+
+    // Initialize Fonts
     TTF_Init();
     defaultFont = TTF_OpenFont("assets/font/jgs5.ttf", 24);
     mdFont = TTF_OpenFont("assets/font/jgs5.ttf", 28);
@@ -146,22 +152,37 @@ void initSDL()
     titleFont = TTF_OpenFont("assets/font/jgs5.ttf", 45);
 }
 
-// Clear buffers
+
+/**
+ * @brief Clears the renderer and sets the draw color to black.
+ * 
+ * This function clears the renderer by filling it with black color.
+ * It is typically called before rendering any new frame.
+ */
 void startRender()
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 }
 
+/**
+ * Renders a black screen by setting the render draw color to black and clearing the renderer.
+ */
 void renderBlackScreen()
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 }
-// Render screen
+
+
+
+/**
+ * Renders the game switcher interface.
+ * This function displays the background, header, image, and text for the game switcher.
+ * It also handles the rendering of the list view and footer.
+ */
 void renderGameSwitcher()
 {
-    // Display background
     string background = "assets/theme/bg.png";
     mrenderer->draw(background, 0, 0, swWidth, swHeight);
 
@@ -171,13 +192,11 @@ void renderGameSwitcher()
         approachCamY = 0;
         string header = "assets/theme/header.png";
 
-        // Draw background text
         if (selectedGame.active)
         {
             drawTextCentered(selectedGame.coreName, defaultFont, renderer, 0 - camX * 0.5, 216 - camY, 640, {255, 255, 255, 80});
         }
 
-        // Draw the image
         if (selectedGameVisual.active)
         {
             string path = selectedGameVisual.filePath;
@@ -188,7 +207,6 @@ void renderGameSwitcher()
             }
         }
 
-        // Draw top text / header
         mrenderer->draw(header, 0, 0, 640, 40);
         if (selectedGame.active)
         {
@@ -202,7 +220,7 @@ void renderGameSwitcher()
             drawTextCentered(prettyName, defaultFont, renderer, 0, 4, 640, defaultTextColor);
         }
     }
-    if (isListView)
+    else if (isListView)
     {
         approachCamX = 0;
         const int leftMargin = 32;
@@ -215,16 +233,8 @@ void renderGameSwitcher()
         };
 
         int selectedY = calcY(selectedGameIndex, 0);
-        if (selectedY > 150)
-        {
-            approachCamY = selectedY - 150;
-        }
-        else
-        {
-            approachCamY = 0;
-        }
+        approachCamY = (selectedY > 150) ? (selectedY - 150) : 0;
 
-        // Draw title
         drawText(listViewTitle, lgFont, renderer, leftMargin, topMargin - camY, {200, 175, 25, 255});
         for (int i = 0; i < currentGameList.size(); i++)
         {
@@ -232,7 +242,6 @@ void renderGameSwitcher()
             int maxLen = 48;
             int textY = calcY(i) - camY;
 
-            // Check if screen position is in range
             if (textY > -35 && textY < 480 + 35)
             {
                 int textX = leftMargin;
@@ -240,8 +249,7 @@ void renderGameSwitcher()
                 {
                     prettyName = prettyName.substr(0, maxLen - 2) + "...";
                 }
-                string text;
-                text = prettyName;
+                string text = prettyName;
                 if (i == selectedGameIndex)
                 {
                     mrenderer->drawRect(0, textY - 5, 640, lineHeight, {255, 255, 255, 25});
@@ -255,30 +263,40 @@ void renderGameSwitcher()
         }
     }
 
-    // Draw footer
     string footer = "assets/theme/footer.png";
     mrenderer->draw(footer, 0, 440, 640, 40);
 }
 
 // Blit a color to the screen. Can be transparent
+/**
+ * Renders a filled rectangle with the specified color on the screen.
+ *
+ * @param color The color to render.
+ */
 void renderColor(SDL_Color color)
 {
-    SDL_Rect rect = {
-        0,
-        0,
-        swWidth,
-        swHeight,
-    };
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderClear(renderer);
 }
-// Update the screen
+
+
+
+/**
+ * Applies the rendered content to the screen.
+ */
 void applyRender()
 {
     SDL_RenderPresent(renderer);
 }
 
+
+
+/**
+ * Sets the application state and performs necessary operations based on the state.
+ * 
+ * @param state The new application state to set.
+ */
 void setAppState(AppState state)
 {
     camY = -25;
@@ -299,96 +317,66 @@ void setAppState(AppState state)
         isPictureView = true;
         currentGameList = recentGameList;
     }
-    else if (appState == APPSTATE_FAVORITELIST)
+    else if (appState == APPSTATE_FAVORITELIST || appState == APPSTATE_RECENTLIST)
     {
         isListView = true;
-        currentGameList = favoriteGameList;
-        // Sort alphabetically
-        std::sort(currentGameList.begin(), currentGameList.end(), [](const GameInfoData &a, const GameInfoData &b)
-                  { return a.name < b.name; });
-        listViewTitle = "Favorites";
-    }
-    else if (appState == APPSTATE_RECENTLIST)
-    {
-        isListView = true;
-        currentGameList = recentGameList;
-        listViewTitle = "Recent Games";
-        // Sort alphabetically
+        currentGameList = (appState == APPSTATE_FAVORITELIST) ? favoriteGameList : recentGameList;
+        listViewTitle = (appState == APPSTATE_FAVORITELIST) ? "Favorites" : "Recent Games";
         std::sort(currentGameList.begin(), currentGameList.end(), [](const GameInfoData &a, const GameInfoData &b)
                   { return a.name < b.name; });
     }
 }
 
+/**
+ * Changes the application state to the next state based on the given increment.
+ *
+ * @param i The increment value used to determine the next state.
+ */
 void nextAppState(int i)
 {
-    setAppState(static_cast<AppState>((appState + i) % 3));
+    int numStates = 3;
+    int nextState = (appState + i) % numStates;
+    setAppState(static_cast<AppState>(nextState));
 }
 
+/**
+ * @brief Updates the application state based on the current view mode.
+ * 
+ * This function is responsible for updating the application state based on the current view mode.
+ * If the picture view mode is active, it increments the selected game index and adjusts the camera position.
+ * If the list view mode is active, it decrements the selected game index and adjusts it based on the input direction.
+ * The selected game is updated based on the current game list and the selected game index.
+ * The selected game visual data is loaded if the selected game is active and the picture view mode is active.
+ */
 void updateAppState()
 {
-
     if (isPictureView)
     {
-        if (dirXInput != 0)
-        {
-            selectedGameIndex += dirXInput;
-            camX -= dirXInput * 32;
-        }
+        selectedGameIndex += dirXInput;
+        camX -= dirXInput * 32;
     }
-    if (isListView)
+    else if (isListView)
     {
-        if (dirYInput != 0)
-        {
-            selectedGameIndex -= dirYInput;
-        }
-        if (dirXInput != 0)
-        {
-            selectedGameIndex += dirXInput;
+        selectedGameIndex -= dirYInput;
 
-            int jumpSize = 4;
-            if (dirXInput < 0)
-            {
-                for (int i = 0; i < jumpSize; i++)
-                {
-                    if (selectedGameIndex > 0)
-                    {
-                        selectedGameIndex--;
-                    }
-                }
-            }
-            else if (dirXInput > 0)
-            {
-                for (int i = 0; i < jumpSize; i++)
-                {
-                    if (selectedGameIndex < currentGameList.size() - 1)
-                    {
-                        selectedGameIndex++;
-                    }
-                }
-            }
-        }
+        int jumpSize = 4;
+        selectedGameIndex += dirXInput * jumpSize;
+        selectedGameIndex = std::clamp(selectedGameIndex, 0, static_cast<int>(currentGameList.size()) - 1);
     }
 
-    int games = currentGameList.size();
-    if (games > 0)
-    {
-        // Ensure negative numbers wrap around
-        selectedGameIndex = (selectedGameIndex + games * 100) % games;
-        selectedGame = currentGameList[selectedGameIndex];
-    }
-    else
-    {
-        selectedGameIndex = 0;
-        selectedGame = {};
-    }
-
-    selectedGameVisual = {};
-    if (selectedGame.active && isPictureView)
-    {
-        selectedGameVisual = loadGameVisualData(selectedGame, MUOS_SAVE_DIR);
-    }
+    selectedGame = (!currentGameList.empty()) ? currentGameList[(selectedGameIndex + currentGameList.size()) % currentGameList.size()] : GameInfoData{};
+    selectedGameVisual = (selectedGame.active && isPictureView) ? loadGameVisualData(selectedGame, MUOS_SAVE_DIR) : GameVisualData{};
 }
 
+/**
+ * @brief Starts the SDL phase of the game switcher.
+ * 
+ * This function initializes SDL, sets the application state to recent view,
+ * and enters the SDL update loop. It handles various events such as button
+ * presses and joystick input, updates the application state, and renders
+ * the game switcher. The loop continues until a condition is met to start
+ * the next phase.
+ */
 void startSDLPhase()
 {
     initSDL();
@@ -418,7 +406,7 @@ void startSDLPhase()
             if (event.type == SDL_QUIT)
             {
                 needExit = true;
-                startNextPhase = 1;
+                startNextPhase = true;
                 break;
             }
 
@@ -435,13 +423,13 @@ void startSDLPhase()
         if (SDL_JoystickGetButton(joystick, RGBUTTON_X) || keyboardState[SDL_SCANCODE_X])
         {
             needExit = true;
-            startNextPhase = 1;
+            startNextPhase = true;
         }
 
         // Select a game when A or SPACE is pressed
         if (SDL_JoystickGetButton(joystick, RGBUTTON_A) || keyboardState[SDL_SCANCODE_SPACE])
         {
-            startNextPhase = 1;
+            startNextPhase = true;
         }
 
         dirXInput = 0;
@@ -516,7 +504,7 @@ void startSDLPhase()
             {
                 needExit = true;
                 needShutdown = true;
-                startNextPhase = 1;
+                startNextPhase = true;
             }
             applyRender();
             SDL_Delay(30);
@@ -546,13 +534,19 @@ void startSDLPhase()
 
         camX = lerp(camX, approachCamX, 0.1);
         camX = clamp(camX, approachCamX - 200, approachCamX + 200);
-        if (startNextPhase == 1)
+        if (startNextPhase)
         {
             break;
         }
     }
 }
 
+/**
+ * @brief Cleans up SDL resources and quits SDL.
+ * 
+ * This function destroys the renderer, window, and fonts used in the application,
+ * and then quits the SDL library.
+ */
 void cleanupSDL()
 {
     SDL_DestroyRenderer(renderer);
@@ -563,6 +557,19 @@ void cleanupSDL()
     SDL_Quit();
 }
 
+/**
+ * @brief The main entry point of the program.
+ *
+ * This function is responsible for starting the game switcher and launching games.
+ * It loads the recent game list and favorite game list, sets the current game list,
+ * and initializes the SDL phase. It then checks if a shutdown or exit is needed,
+ * and performs the necessary actions. If a game is selected, it writes the game info,
+ * prepares for the game launch, and executes the command to launch the game.
+ *
+ * @param argc The number of command-line arguments.
+ * @param argv An array of command-line arguments.
+ * @return 0 if the program exits successfully, 1 otherwise.
+ */
 int main(int argc, char *argv[])
 {
     setbuf(stdout, NULL);
@@ -575,18 +582,12 @@ int main(int argc, char *argv[])
         favoriteGameList = loadGameListAtPath(MUOS_FAVORITE_DIR);
         currentGameList = recentGameList;
         MUOS_SAVE_DIR = pathvar().second;
-        
-        // Trim list to 10 games
-        // if (recentGameList.size() > 10)
-        // {
-        //     recentGameList.resize(10);
-        // }
 
         startSDLPhase();
 
         if (needShutdown)
         {
-            printf("User has triggerd a shutdown....\n");
+            printf("User has triggered a shutdown....\n");
             startRender();
             renderBlackScreen();
             applyRender();
@@ -623,8 +624,9 @@ int main(int argc, char *argv[])
 
                 printf("Writing Game Info\n");
                 string historyPath = MUOS_HISTORY_DIR + "/" + selectedGame.name.substr(0, selectedGame.name.find_last_of(".")) + ".cfg";
-                size_t zipPos = historyPath.find_last_of(".zip"); 
-                if (zipPos != string::npos) {
+                size_t zipPos = historyPath.find_last_of(".zip");
+                if (zipPos != string::npos)
+                {
                     historyPath = historyPath.substr(0, zipPos) + ".cfg";
                 }
 
@@ -669,7 +671,7 @@ int main(int argc, char *argv[])
             }
             catch (const std::exception &e)
             {
-                std::cerr << "Error when luanching game. Exiting" << std::endl;
+                std::cerr << "Error when launching game. Exiting" << std::endl;
                 std::cerr << e.what() << std::endl;
 
                 cleanupSDL();
