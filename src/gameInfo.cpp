@@ -12,12 +12,6 @@
 
 using namespace std;
 
-/**
- * Loads game information from a file.
- *
- * @param filePath The path to the file containing the game information.
- * @return The loaded game information.
- */
 GameInfoData loadGameInfo(string filePath)
 {
     GameInfoData game;
@@ -32,27 +26,29 @@ GameInfoData loadGameInfo(string filePath)
         {
             switch (lineCount)
             {
-                case 0:
-                    game.name = std::move(line);
-                    break;
-                case 1:
-                    game.core = std::move(line);
-                    break;
-                case 2:
-                    game.coreName = std::move(line);
-                    break;
-                case 3:
-                    game.number = std::move(line);
-                    break;
-                case 4:
-                    game.drive = std::move(line);
-                    break;
-                case 5:
-                    game.folder = std::move(line);
-                    break;
-                case 6:
-                    game.fileName = std::move(line);
-                    break;
+            case 0:
+                game.name = line;
+                break;
+            case 1:
+                game.core = line;
+                break;
+            case 2:
+                game.coreName = line;
+                break;
+            case 3:
+                game.number = line;
+                break;
+            case 4:
+                game.drive = line;
+                break;
+            case 5:
+                game.folder = line;
+                break;
+            case 6:
+                game.fileName = line;
+                break;
+            default:
+                break;
             }
             lineCount++;
         }
@@ -66,16 +62,9 @@ GameInfoData loadGameInfo(string filePath)
     return game;
 }
 
-/**
- * Writes the game information to a file.
- * 
- * @param filePath The path of the file to write the game information to.
- * @param game The GameInfoData object containing the game information.
- * @return The GameInfoData object that was written to the file.
- */
 GameInfoData writeGameInfo(string filePath, GameInfoData game)
 {
-    std::ofstream file(filePath);
+    ofstream file(filePath);
     if (file.is_open())
     {
         file << game.name << std::endl;
@@ -97,20 +86,26 @@ GameInfoData writeGameInfo(string filePath, GameInfoData game)
     return game;
 }
 
-/**
- * Loads the game list from the specified folder path.
- * 
- * @param folderPath The path to the folder containing the game files.
- * @return A vector of GameInfoData objects representing the loaded game list.
- */
 vector<GameInfoData> loadGameListAtPath(string folderPath)
 {
+    vector<filesystem::directory_entry> entries;
     vector<GameInfoData> games;
 
     // Check if directory exists
     if (filesystem::exists(folderPath))
     {
         for (const auto &entry : filesystem::directory_iterator(folderPath))
+        {
+            if (entry.path().extension() == ".cfg")
+            {
+                entries.push_back(entry);
+            }
+        }
+
+        std::sort(entries.begin(), entries.end(), [](const filesystem::directory_entry &a, const filesystem::directory_entry &b)
+                  { return filesystem::last_write_time(a) > filesystem::last_write_time(b); });
+
+        for (const auto &entry : entries)
         {
             if (entry.path().extension() == ".cfg")
             {
@@ -121,25 +116,26 @@ vector<GameInfoData> loadGameListAtPath(string folderPath)
                 }
             }
         }
-
-        std::sort(games.begin(), games.end(), [](const GameInfoData &a, const GameInfoData &b)
-                  { return a.core < b.core; });
     }
     return games;
 }
 
-/**
- * Loads the visual data for a game based on the provided game information and folder path.
- *
- * @param game The game information data.
- * @param folderPath The path to the folder containing the game visual data.
- * @return The loaded game visual data.
- */
 GameVisualData loadGameVisualData(GameInfoData game, string folderPath)
 {
     GameVisualData visualData;
-    if (game.active && !game.coreName.empty() && !game.fileName.empty())
+    if (game.active && game.coreName.length() > 0 && game.fileName.length() > 0)
     {
+        string partialMatchFolder;
+        string exactMatchFolder;
+        vector<filesystem::directory_entry> subDirectories;
+        for (const auto &entry : filesystem::directory_iterator(folderPath))
+        {
+            if (entry.is_directory())
+            {
+                subDirectories.push_back(entry);
+            }
+        }
+
         string normalizedCore = game.core;
         vector<string> coreSplit = strSplit(game.core, '_');
         if (coreSplit.size() > 1)
@@ -152,17 +148,7 @@ GameVisualData loadGameVisualData(GameInfoData game, string folderPath)
         normalizedCore = strReplaceAll(normalizedCore, "_", "");
         normalizedCore = strToUpper(normalizedCore);
 
-        vector<filesystem::directory_entry> subDirectories;
-        for (const auto &entry : filesystem::directory_iterator(folderPath))
-        {
-            if (entry.is_directory())
-            {
-                subDirectories.push_back(entry);
-            }
-        }
-
-        string partialMatchFolder;
-        string exactMatchFolder;
+        // printf("Searching for core: %s\n", normalizedCore.c_str());
         for (const auto &entry : subDirectories)
         {
             string foldername = entry.path().filename();
@@ -174,20 +160,23 @@ GameVisualData loadGameVisualData(GameInfoData game, string folderPath)
             if (normalizedCore == normalizedFolderName)
             {
                 exactMatchFolder = entry.path().string();
+                // printf("Found Exact Match: %s\n", normalizedFolderName.c_str());
                 break;
             }
             else if (strStartsWith(normalizedFolderName, normalizedCore))
             {
                 partialMatchFolder = entry.path().string();
+                // printf("Partial Match: %s\n", normalizedFolderName.c_str());
             }
         }
 
-        string subFolderPath = exactMatchFolder.empty() ? partialMatchFolder : exactMatchFolder;
+        string subFolderPath = exactMatchFolder.length() > 0 ? exactMatchFolder : partialMatchFolder;
 
-        if (!subFolderPath.empty())
+        if (subFolderPath.length() > 0)
         {
             vector<filesystem::directory_entry> screenShots;
 
+            // Check if directory exists
             if (filesystem::exists(subFolderPath))
             {
                 for (const auto &entry : filesystem::directory_iterator(subFolderPath))
@@ -202,7 +191,7 @@ GameVisualData loadGameVisualData(GameInfoData game, string folderPath)
                 std::sort(screenShots.begin(), screenShots.end(), [](const filesystem::directory_entry &a, const filesystem::directory_entry &b)
                           { return filesystem::last_write_time(a) > filesystem::last_write_time(b); });
 
-                if (!screenShots.empty())
+                if (screenShots.size() > 0)
                 {
                     visualData.active = true;
                     std::string gameFileName = game.fileName;
