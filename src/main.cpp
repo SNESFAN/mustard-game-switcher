@@ -29,7 +29,7 @@ int swHeight = 480;
 int hwWidth = 640;
 int hwHeight = 480;
 
-string ROM_GO = "/tmp/rom_go";
+
 
 #ifdef DEBUG
 bool debugMode = true;
@@ -43,7 +43,9 @@ string MUOS_FAVORITE_DIR = "/mnt/mmc/MUOS/info/favourite";
 string MUOS_SAVE_DIR;
 #endif
 
-
+string MUOS_configFile = "/mnt/mmc/MUOS/retroarch/retroarch.cfg";
+string MUOS_logFile = "log.txt";
+string ROM_GO = "/tmp/rom_go";
 
 SDL_Color defaultTextColor = {255, 255, 255, 255};
 SDL_Color shadowTextColor = {0, 0, 0, 225};
@@ -78,8 +80,8 @@ int dirXInput = 0;
 int dirYInput = 0;
 
 std::pair<std::string, std::string> pathvar() {
-    std::ifstream configFile("/mnt/mmc/MUOS/retroarch/retroarch.cfg");
-    std::ofstream logFile("log.txt");
+    std::ifstream configFile(MUOS_configFile);
+    std::ofstream logFile(MUOS_logFile);
 
     std::string savefileDir, savestateDir;
 
@@ -98,18 +100,17 @@ std::pair<std::string, std::string> pathvar() {
                 savestateDir = line.substr(line.find("\"") + 1, line.rfind("\"") - line.find("\"") - 1);
             }
         }
-
-        if (!savefileDir.empty() && !savestateDir.empty()) {
-            // Output the path values to the log file
-            logFile << savefileDir << std::endl;
-            logFile << savestateDir << std::endl;
-
-            std::cout << "Paths extracted and logged successfully." << std::endl;
+            // Log the extracted paths or if it failed
+        if (!savefileDir.empty() || !savestateDir.empty()) {
+            logFile << "Paths extracted and logged successfully." << std::endl;
+            logFile << "Save File Path: " << savefileDir << std::endl;
+            logFile << "Save State Path: " << savestateDir << std::endl;
         } else {
             std::cout << "No lines starting with \"" << targetWord1 << "\" and \"" << targetWord2 << "\" found in the config file." << std::endl;
         }
     } else {
-        std::cout << "Failed to open config file or log file." << std::endl;
+        logFile << "Failed to open config file at static path:" << std::endl;
+        logFile << MUOS_configFile << std::endl;
     }
 
     configFile.close();
