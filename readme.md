@@ -32,7 +32,7 @@ This will allow you to resume the GameSwitcher when you power the device down
 2. From the muOS main menu, open `Retroarch`. Then go into `Settings -> Saving` and toggle
 
 - `Save State Thumbnails: ON`- default
-- `Sort Save States into Folders by Core Name: ON`- not default
+- `Sort Save States into Folders by Core Name: ON`- default
 - `Auto Save State: ON`- not default
 - `Auto Load State: ON`- not default
 
