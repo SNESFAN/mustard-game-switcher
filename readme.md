@@ -1,6 +1,6 @@
-# GameSwitcher Protoype for RG35XX+ muOS v11.1
+# GameSwitcher Protoype for RG35XX SP/PLUS/H/2024' 'splush24' muOS v11.2
 
-A GameSwitcher app for muOS v11.1 inspired by onionOS
+A GameSwitcher app for muOS v11.2 inspired by onionOS
 
 <div>
 <img src="https://i.imgur.com/a1uIJaF.png" width="300">
@@ -8,7 +8,6 @@ A GameSwitcher app for muOS v11.1 inspired by onionOS
 </div>
 
 The GameSwitcher allows you to launch your Recent/Favorite Retroarch games and jump between them.
-It also allows for setting up a quick save, shutoff, and resume feature (with some configuration required)
 
 This app was developed rapidly so it may have bugs. Backup your saves / games before installing.
 
@@ -24,12 +23,7 @@ After launching, you should now see your recent Retroarch games show up.
 
 # Additional Configuration:
 
-If you want Shutoff / Resume to work, you will want to do some additional configuration 
-
-1. From the muOS main menu, open `Configuration -> General Settings` and set Device Startup to `Last Game Played`.
-This will allow you to resume the GameSwitcher when you power the device down
-
-2. From the muOS main menu, open `Retroarch`. Then go into `Settings -> Saving` and toggle
+From the muOS main menu, open `Retroarch`. Then go into `Settings -> Saving` and toggle
 
 - `Save State Thumbnails: ON`- default
 - `Sort Save States into Folders by Core Name: ON`- default
@@ -40,12 +34,10 @@ Once you've completed this, make sure to save your configuration (`Configuration
 
 # Controls:
 
-If you followed the configuration guide, you can now open games from the GameSwitcher by pressing `A`, and close them by pressing `MENU + SELECT`.
-Keep `MENU + SELECT` held to power off. The next time you power on, you should be back to the GameSwitcher screen with your last played save.  
+If you followed the configuration guide, you can now open games from the GameSwitcher by pressing `A`, and close them by pressing `MENU + Start`.
 
-- `MENU (Hold) or MENU + SELECT`: Shutoff device
 - `X`: Exit GameSwitcher
-- `B`: Swap to list view
+- `B`: Swap to list view & toggle between recent and favorites
 - `A`: Launch Game
 - `Left/Right`: Navigate recent games
 
@@ -60,15 +52,15 @@ You will also need to copy some of the files onto `/mnt/muOSDump/` to test it pr
 
 Personal ToDo:
 
-- better / cleanup debugging & logging solution
-- add/utilize MUOS theme & elements
-- Support for external (non-retroarch) emulators
-- find auto-start solution (may need to be mainlined into MUOS)
-- fix resume/last game power-on function if a gameswitcher launched game was running
+- better / cleanup debugging & logging solution (WIP)
+- add/utilize MUOS theme & elements (WIP)
+- Support for external (non-retroarch) emulators - (restructure core assignment behavior to utilize muos launcher.sh instead)
+- find auto-start solution - (replace history launching script in frontend.sh & startup behavior to history as hacky solution)
+- fix resume power-on function & shutdown savestate if a gameswitcher launched game was running (???)
 
   
 Additions & bugs fixed from main
-+ got running on MUOS 11.1
++ fixed to work with MUOS 11.2
 + implemented background image asset as background image
 + dynamic savestate screenshot location from retroarch config (only SD1 for now)
 + archive .zip package installs under applications like dingux commander etc
@@ -76,4 +68,5 @@ Additions & bugs fixed from main
 + double game enteries in history list
 + screenshots only displaying for 1 title per system / not always sync'd with correct title
 + dynamic savestate location only working when mapped to SD1
++ fixed 'last played' to work with power-on setting
 
