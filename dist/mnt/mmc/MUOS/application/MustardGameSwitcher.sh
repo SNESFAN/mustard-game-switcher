@@ -29,6 +29,8 @@ export HOME=/root
 export LD_LIBRARY_PATH=/usr/lib32
 export ROM_LAST=/tmp/rom_last
 export LAST_PLAY="/opt/muos/config/lastplay.txt"
+echo "retroarch" >/tmp/fg_proc
+
 
 # # Get the data of the current script
 # # Ensure the data is not empty
