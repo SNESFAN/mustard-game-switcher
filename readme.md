@@ -33,7 +33,6 @@ This will allow you to resume the GameSwitcher when you power the device down
 
 - `Save State Thumbnails: ON`- default
 - `Sort Save States into Folders by Core Name: ON`- default
-- `Save State Thumbnails: ON`- default
 - `Auto Save State: ON`- not default
 - `Auto Load State: ON`- not default
 
@@ -65,6 +64,7 @@ Personal ToDo:
 - add/utilize MUOS theme & elements
 - Support for external (non-retroarch) emulators
 - find auto-start solution (may need to be mainlined into MUOS)
+- fix resume/last game power-on function if a gameswitcher launched game was running
 
   
 Additions & bugs fixed from main
