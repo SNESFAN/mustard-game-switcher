@@ -15,40 +15,55 @@ using namespace std;
 GameInfoData loadGameInfo(string filePath)
 {
     GameInfoData game;
-
     std::ifstream file(filePath);
     if (file.is_open())
     {
-        game.active = true;
         std::string line;
+        std::getline(file, line); // Read the first line to check the format
+        if (line.find("/mnt/mmc/MUOS/info/core/") == 0) // New format detected
+        {
+            // Close the current file and open the new file path specified in the first line
+            file.close();
+            file.open(line);
+            if (!file.is_open())
+            {
+                std::cerr << "Error opening new file path: " << line << std::endl;
+                return game; // Return an inactive game info if the new file can't be opened
+            }
+        }
+        else
+        {
+            // If it's the old format, reset the file stream to read from the beginning again
+            file.seekg(0, std::ios::beg);
+        }
+
+        game.active = true;
         int lineCount = 0;
         while (std::getline(file, line))
         {
             switch (lineCount)
             {
-            case 0:
-                game.name = line;
-                break;
-            case 1:
-                game.core = line;
-                break;
-            case 2:
-                game.coreName = line;
-                break;
-            case 3:
-                game.number = line;
-                break;
-            case 4:
-                game.drive = line;
-                break;
-            case 5:
-                game.folder = line;
-                break;
-            case 6:
-                game.fileName = line;
-                break;
-            default:
-                break;
+                case 0:
+                    game.name = std::move(line);
+                    break;
+                case 1:
+                    game.core = std::move(line);
+                    break;
+                case 2:
+                    game.coreName = std::move(line);
+                    break;
+                case 3:
+                    game.number = std::move(line);
+                    break;
+                case 4:
+                    game.drive = std::move(line);
+                    break;
+                case 5:
+                    game.folder = std::move(line);
+                    break;
+                case 6:
+                    game.fileName = std::move(line);
+                    break;
             }
             lineCount++;
         }
