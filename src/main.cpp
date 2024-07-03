@@ -652,11 +652,30 @@ int main(int argc, char *argv[])
                 if (fs::exists("/mnt/mmc/MUOS/.retroarch/retroarch.cfg"))
                 {
                     // V10
+                std::ofstream outputFile("/opt/muos/config/lastplay.txt");
+                outputFile << selectedGame.name << "\n";
+                outputFile << selectedGame.core << "\n";
+                outputFile << selectedGame.coreName << "\n";
+                outputFile << selectedGame.number << "\n";
+                outputFile << selectedGame.drive << "\n";
+                outputFile << selectedGame.folder << "\n";
+                outputFile << selectedGame.fileName << "\n";
+                outputFile.close();
+
                     cmd = "/mnt/mmc/MUOS/retroarch -c \"/mnt/mmc/MUOS/.retroarch/retroarch.cfg\" -L \"/mnt/mmc/MUOS/core/" + selectedGame.core + "\" \"" + romPath + "\"";
                 }
                 else
                 {
                     // V11
+                std::ofstream outputFile("/opt/muos/config/lastplay.txt");
+                outputFile << selectedGame.name << "\n";
+                outputFile << selectedGame.core << "\n";
+                outputFile << selectedGame.coreName << "\n";
+                outputFile << selectedGame.number << "\n";
+                outputFile << selectedGame.drive << "\n";
+                outputFile << selectedGame.folder << "\n";
+                outputFile << selectedGame.fileName << "\n";
+                outputFile.close();
                     cmd = "retroarch -c \"/mnt/mmc/MUOS/retroarch/retroarch.cfg\" -L \"/mnt/mmc/MUOS/core/" + selectedGame.core + "\" \"" + romPath + "\"";
                 }
                 printf("Executing Command: %s\n", cmd.c_str());

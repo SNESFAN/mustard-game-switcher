@@ -10,7 +10,7 @@ if pgrep -f "muplay" > /dev/null; then
 	rm "$SND_PIPE"
 fi
 
-echo app > /tmp/act_go
+echo launcher > /tmp/act_go
 
 . /opt/muos/script/system/parse.sh
 
