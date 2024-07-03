@@ -56,8 +56,6 @@ Personal ToDo:
 - add/utilize MUOS theme & elements (WIP)
 - Support for external (non-retroarch) emulators - (restructure core assignment behavior to utilize muos launcher.sh instead)
 - find auto-start solution - (replace history launching script in frontend.sh & startup behavior to history as hacky solution)
-- fix resume power-on function & shutdown savestate if a gameswitcher launched game was running (???)
-
   
 Additions & bugs fixed from main
 + fixed to work with MUOS 11.2
@@ -69,4 +67,5 @@ Additions & bugs fixed from main
 + screenshots only displaying for 1 title per system / not always sync'd with correct title
 + dynamic savestate location only working when mapped to SD1
 + fixed 'last played' to work with power-on setting
++ fix resume power-on function & shutdown savestate if a gameswitcher launched game was running 
 
