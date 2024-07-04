@@ -32,6 +32,15 @@ From the muOS main menu, open `Retroarch`. Then go into `Settings -> Saving` and
 
 Once you've completed this, make sure to save your configuration (`Configuration File -> Save Current Configuration`)
 
+(Optional script (tested on 11.2 only) included in Task Toolkit to toggle replacing history with GameSwitcher)
+Main Menu > APPLICATIONS > Task Toolkit > Toggle GameSwitcher-History
+Automatic reboot required
+
+Main Menu > History - is replaced with Gameswitcher until Toggle GameSwitcher-History is re-ran
+Main Menu > Configuration > General Settings > Device Startup > History (B to save) - game switcher starts on poweron
+
+Updates will likely kill this function, if you replace history with GameSwitcher ensure to toggle off/rerun task (restore history) prior to running an update
+
 # Controls:
 
 If you followed the configuration guide, you can now open games from the GameSwitcher by pressing `A`, and close them by pressing `MENU + Start`.
