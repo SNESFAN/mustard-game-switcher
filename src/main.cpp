@@ -667,16 +667,26 @@ int main(int argc, char *argv[])
                 else
                 {
                     // V11
-                std::ofstream outputFile("/opt/muos/config/lastplay.txt");
-                outputFile << selectedGame.name << "\n";
-                outputFile << selectedGame.core << "\n";
-                outputFile << selectedGame.coreName << "\n";
-                outputFile << selectedGame.number << "\n";
-                outputFile << selectedGame.drive << "\n";
-                outputFile << selectedGame.folder << "\n";
-                outputFile << selectedGame.fileName << "\n";
-                outputFile.close();
-                    cmd = "retroarch -c \"/mnt/mmc/MUOS/retroarch/retroarch.cfg\" -L \"/mnt/mmc/MUOS/core/" + selectedGame.core + "\" \"" + romPath + "\"";
+                std::ofstream outputFile1("/opt/muos/config/lastplay1.txt");
+                outputFile1 << selectedGame.name << "\n";
+                outputFile1 << selectedGame.core << "\n";
+                outputFile1 << selectedGame.coreName << "\n";
+                outputFile1 << selectedGame.number << "\n";
+                outputFile1 << selectedGame.drive << "\n";
+                outputFile1 << selectedGame.folder << "\n";
+                outputFile1 << selectedGame.fileName << "\n";
+                outputFile1.close();
+
+                std::ofstream outputFile2("/tmp/rom_go");
+                outputFile2 << selectedGame.name << "\n";
+                outputFile2 << selectedGame.core << "\n";
+                outputFile2 << selectedGame.coreName << "\n";
+                outputFile2 << selectedGame.number << "\n";
+                outputFile2 << selectedGame.drive << "\n";
+                outputFile2 << selectedGame.folder << "\n";
+                outputFile2 << selectedGame.fileName << "\n";
+                outputFile2.close();
+                    cmd = "/opt/muos/script/mux/launch.sh";
                 }
                 printf("Executing Command: %s\n", cmd.c_str());
                 // Execute the command when not in debug mode
