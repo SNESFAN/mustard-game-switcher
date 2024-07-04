@@ -64,7 +64,7 @@ Personal ToDo:
 
 - better / cleanup debugging & logging solution (WIP)
 - add/utilize MUOS theme & elements (WIP)
-- fix external ds (drastic) savestate behavior
+- add Support for external (non-retroarch) emulators & screenshots
 - ability to remove history items within app
 - change controls to allign with main OS
 
@@ -80,6 +80,5 @@ Additions & bugs fixed from main
 + fixed dynamic savestate location only working when mapped to SD1
 + fixed 'last played' to work with power-on setting
 + fixed resume power-on function & shutdown savestate if a gameswitcher launched game was running
-+ added Support for external (non-retroarch) emulators & screenshots
 + added auto-start solution - (replace history function in frontend.sh & startup behavior to history as hacky solution)
 
