@@ -54,7 +54,10 @@ Personal ToDo:
 
 - better / cleanup debugging & logging solution (WIP)
 - add/utilize MUOS theme & elements (WIP)
-- find auto-start solution - (replace history launching script in frontend.sh & startup behavior to history as hacky solution)
+- fix external ds (drastic) savestate behavior
+- ability to remove history items within app
+- change controls to allign with main OS
+
   
 Additions & bugs fixed from main
 + fixed to work with MUOS 11.2
@@ -68,4 +71,5 @@ Additions & bugs fixed from main
 + fixed 'last played' to work with power-on setting
 + fix resume power-on function & shutdown savestate if a gameswitcher launched game was running
 + Support for external (non-retroarch) emulators & screenshots
++ auto-start solution - (replace history function in frontend.sh & startup behavior to history as hacky solution)
 
