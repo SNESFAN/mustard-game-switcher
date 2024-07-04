@@ -61,15 +61,15 @@ Personal ToDo:
   
 Additions & bugs fixed from main
 + fixed to work with MUOS 11.2
-+ implemented background image asset as background image
-+ dynamic savestate screenshot location from retroarch config (only SD1 for now)
-+ archive .zip package installs under applications like dingux commander etc
-+ copy to archive zip automatically on compilation
-+ double game enteries in history list
-+ screenshots only displaying for 1 title per system / not always sync'd with correct title
-+ dynamic savestate location only working when mapped to SD1
++ added background image asset as background image
++ added dynamic savestate screenshot location from retroarch config (only SD1 for now)
++ added archive .zip package installs under applications like dingux commander etc
++ added copy to archive zip automatically on compilation
++ fixed double game enteries in history list
++ fixed screenshots only displaying for 1 title per system / not always sync'd with correct title
++ fixed dynamic savestate location only working when mapped to SD1
 + fixed 'last played' to work with power-on setting
-+ fix resume power-on function & shutdown savestate if a gameswitcher launched game was running
-+ Support for external (non-retroarch) emulators & screenshots
-+ auto-start solution - (replace history function in frontend.sh & startup behavior to history as hacky solution)
++ fixed resume power-on function & shutdown savestate if a gameswitcher launched game was running
++ added Support for external (non-retroarch) emulators & screenshots
++ added auto-start solution - (replace history function in frontend.sh & startup behavior to history as hacky solution)
 
