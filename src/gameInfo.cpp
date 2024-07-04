@@ -138,100 +138,29 @@ vector<GameInfoData> loadGameListAtPath(string folderPath)
 GameVisualData loadGameVisualData(GameInfoData game, string folderPath)
 {
     GameVisualData visualData;
-    if (game.active && game.coreName.length() > 0 && game.fileName.length() > 0)
+    visualData.active = game.active;
+    visualData.filePath = "";
+
+    // Get the subdirectories in the folderPath
+    vector<string> subdirectories;
+    for (const auto &entry : filesystem::directory_iterator(folderPath))
     {
-        string partialMatchFolder;
-        string exactMatchFolder;
-        vector<filesystem::directory_entry> subDirectories;
-        for (const auto &entry : filesystem::directory_iterator(folderPath))
+        if (entry.is_directory())
         {
-            if (entry.is_directory())
-            {
-                subDirectories.push_back(entry);
-            }
-        }
-
-        string normalizedCore = game.core;
-        vector<string> coreSplit = strSplit(game.core, '_');
-        if (coreSplit.size() > 1)
-        {
-            coreSplit.pop_back();
-            normalizedCore = strJoin(coreSplit, "");
-        }
-        normalizedCore = strReplaceAll(normalizedCore, " ", "");
-        normalizedCore = strReplaceAll(normalizedCore, "-", "");
-        normalizedCore = strReplaceAll(normalizedCore, "_", "");
-        normalizedCore = strToUpper(normalizedCore);
-
-        // printf("Searching for core: %s\n", normalizedCore.c_str());
-        for (const auto &entry : subDirectories)
-        {
-            string foldername = entry.path().filename();
-            string normalizedFolderName = strReplaceAll(strToUpper(foldername), " ", "");
-            normalizedFolderName = strReplaceAll(normalizedFolderName, " ", "");
-            normalizedFolderName = strReplaceAll(normalizedFolderName, "-", "");
-            normalizedFolderName = strReplaceAll(normalizedFolderName, "_", "");
-
-            if (normalizedCore == normalizedFolderName)
-            {
-                exactMatchFolder = entry.path().string();
-                // printf("Found Exact Match: %s\n", normalizedFolderName.c_str());
-                break;
-            }
-            else if (strStartsWith(normalizedFolderName, normalizedCore))
-            {
-                partialMatchFolder = entry.path().string();
-                // printf("Partial Match: %s\n", normalizedFolderName.c_str());
-            }
-        }
-
-        string subFolderPath = exactMatchFolder.length() > 0 ? exactMatchFolder : partialMatchFolder;
-
-        if (subFolderPath.length() > 0)
-        {
-            vector<filesystem::directory_entry> screenShots;
-
-            // Check if directory exists
-            if (filesystem::exists(subFolderPath))
-            {
-                for (const auto &entry : filesystem::directory_iterator(subFolderPath))
-                {
-                    std::string extension = entry.path().extension().string();
-                    std::string fileName = entry.path().filename().string();
-                    if (extension == ".png")
-                    {
-                        screenShots.push_back(entry);
-                    }
-                }
-                std::sort(screenShots.begin(), screenShots.end(), [](const filesystem::directory_entry &a, const filesystem::directory_entry &b)
-                          { return filesystem::last_write_time(a) > filesystem::last_write_time(b); });
-
-                if (screenShots.size() > 0)
-                {
-                    visualData.active = true;
-                    std::string gameFileName = game.fileName;
-                    std::size_t dotIndex = gameFileName.find(".");
-                    if (dotIndex != std::string::npos)
-                    {
-                        gameFileName = gameFileName.substr(0, dotIndex);
-                    }
-                    for (const auto &entry : screenShots)
-                    {
-                        std::string fileName = entry.path().filename().string();
-                        std::size_t dotIndex = fileName.find(".");
-                        if (dotIndex != std::string::npos)
-                        {
-                            fileName = fileName.substr(0, dotIndex);
-                        }
-                        if (fileName == gameFileName)
-                        {
-                            visualData.filePath = entry.path().string();
-                            break;
-                        }
-                    }
-                }
-            }
+            subdirectories.push_back(entry.path());
         }
     }
+
+    // Search for the game.name with .state.auto.png extension in the subdirectories
+    for (const auto &subdirectory : subdirectories)
+    {
+        string searchPath = subdirectory + "/" + game.name + ".state.auto.png";
+        if (filesystem::exists(searchPath))
+        {
+            visualData.filePath = searchPath;
+            break;
+        }
+    }
+
     return visualData;
 }
