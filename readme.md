@@ -37,6 +37,7 @@ Main Menu > APPLICATIONS > Task Toolkit > Toggle GameSwitcher-History
 Automatic reboot required
 
 Main Menu > History - is replaced with Gameswitcher until Toggle GameSwitcher-History is re-ran
+
 Main Menu > Configuration > General Settings > Device Startup > History (B to save) - game switcher starts on poweron
 
 Updates will likely kill this function, if you replace history with GameSwitcher ensure to toggle off/rerun task (restore history) prior to running an update
